@@ -15,7 +15,7 @@ namespace PaginationTest.MVC.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "Customer");
         }
 
         public IActionResult Privacy()
