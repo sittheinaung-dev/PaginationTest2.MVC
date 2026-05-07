@@ -1,0 +1,83 @@
+﻿@using PaginationTest.Models
+@model PaginationModel
+@{
+    // Logic ကို ပိုရှင်းလင်းအောင် ပြန်လည်ရေးဆွဲထားပါတယ်
+    if (Model.PageCount <= 1)
+    {
+        return; // Page တစ်ခုတည်းဆိုရင် pagination bar ကို မပြပါဘူး
+    }
+
+    // လက်ရှိ page ကို အလယ်မှာထားပြီး ဘယ်ညာ ဘယ်နှစ်ခုပြမလဲ
+    int pagesToShow = 2;
+    int startPage = Math.Max(1, Model.PageNo - pagesToShow);
+    int endPage = Math.Min(Model.PageCount, Model.PageNo + pagesToShow);
+
+    // Page link တွေ generate လုပ်ဖို့ helper function
+    string GetUrl(int pageNo)
+    {
+        var routeValues = Model.RouteValues ?? new Dictionary<string, string>();
+        routeValues["pageNo"] = pageNo.ToString();
+
+        // Controller ကိုပါ dynamic ဖြစ်ချင်ရင် ဒီလိုသုံးနိုင်ပါတယ်
+        // return Url.Action(Model.ActionName, Model.ControllerName, routeValues);
+
+        // Query string ကို ကိုယ်တိုင်တည်ဆောက်ခြင်း
+        var queryString = string.Join("&", routeValues.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+        return $"/{Model.ControllerName ?? "Customer"}/{Model.ActionName}?{queryString}";
+    }
+}
+
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        @if (Model.PageNo > 1)
+        {
+            <li class="page-item"><a class="page-link" href="@GetUrl(Model.PageNo - 1)">Previous</a></li>
+        }
+        else
+        {
+            <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+        }
+
+        @if (startPage > 1)
+        {
+            <li class="page-item"><a class="page-link" href="@GetUrl(1)">1</a></li>
+            @if (startPage > 2)
+            {
+                <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+            }
+        }
+
+        @for (int i = startPage; i <= endPage; i++)
+        {
+            if (i == Model.PageNo)
+            {
+                // လက်ရှိ page ကို active အဖြစ်ပြပါမယ်
+                <li class="page-item active" aria-current="page">
+                    <a class="page-link" href="#">@i</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item"><a class="page-link" href="@GetUrl(i)">@i</a></li>
+            }
+        }
+
+        @if (endPage < Model.PageCount)
+        {
+            @if (endPage < Model.PageCount - 1)
+            {
+                <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+            }
+            <li class="page-item"><a class="page-link" href="@GetUrl(Model.PageCount)">@Model.PageCount</a></li>
+        }
+
+        @if (Model.PageNo < Model.PageCount)
+        {
+            <li class="page-item"><a class="page-link" href="@GetUrl(Model.PageNo + 1)">Next</a></li>
+        }
+        else
+        {
+            <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
+        }
+    </ul>
+</nav>

@@ -1,0 +1,43 @@
+﻿@using PaginationTest.Models
+@model CustomerListResponseModel
+@{
+    ViewData["Title"] = "Customer List";
+    int pageSize = Model.PageSize;
+    int count = (Model.PageNo - 1) * pageSize;
+}
+
+<h1>Customer List</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Phone</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Data)
+        {
+            <tr>
+                <td>@(++count)</td>
+                <td>@item.ContactName</td>
+                <td>@item.Address</td>
+                <td>@item.Phone</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@await Html.PartialAsync("_Pagination", new PaginationModel
+{
+    PageNo = Model.PageNo,
+    PageCount = Model.PageCount,
+    ActionName = "Index", // သွားရမယ့် Action Method
+    ControllerName = "Customer", // သွားရမယ့် Controller
+    RouteValues = new Dictionary<string, string> // pageSize ကဲ့သို့ အခြား parameter များ
+    {
+        { "pageSize", Model.PageSize.ToString() }
+    }
+})
